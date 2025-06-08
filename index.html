@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เกมเรียงประโยคแสนสนุก  सेंटेंस बिल्डिंग गेम</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --purple: #8e44ad;
+            --yellow: #f1c40f;
+            --white: #ffffff;
+            --dark: #333;
+            --light-gray: #ecf0f1;
+            --green: #2ecc71;
+            --red: #e74c3c;
+        }
+
+        body {
+            font-family: 'Kanit', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--purple), var(--yellow));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--dark);
+        }
+
+        .game-container {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        h1 {
+            color: var(--purple);
+            font-size: 2.5em;
+        }
+        
+        h2 {
+            color: var(--purple);
+            font-size: 1.8em;
+        }
+
+        p {
+            font-size: 1.2em;
+            line-height: 1.6;
+        }
+
+        .input-group {
+            margin: 20px 0;
+        }
+
+        input[type="text"] {
+            padding: 15px;
+            font-size: 1.2em;
+            font-family: 'Kanit', sans-serif;
+            border-radius: 10px;
+            border: 2px solid var(--light-gray);
+            width: 60%;
+            text-align: center;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--purple);
+        }
+
+        button {
+            background-color: var(--purple);
+            color: var(--white);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-family: 'Kanit', sans-serif;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #732d91;
+            transform: translateY(-2px);
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: var(--light-gray);
+            border-radius: 10px;
+        }
+        
+        .game-header div {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        #timer {
+            color: var(--red);
+        }
+        
+        #score, #level-display {
+            color: var(--purple);
+        }
+
+        #question-area, #answer-area {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            min-height: 80px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #question-area {
+            background-color: #f8f9fa;
+            border: 2px dashed var(--light-gray);
+        }
+        
+        #answer-area {
+            background-color: #e8f6f3;
+            border: 2px dashed var(--green);
+        }
+
+        .word-block {
+            background-color: var(--yellow);
+            color: var(--dark);
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 1.4em;
+            cursor: grab;
+            user-select: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+
+        .word-block:active {
+            cursor: grabbing;
+            transform: scale(1.1);
+            background-color: #f39c12;
+        }
+
+        #feedback {
+            margin-top: 20px;
+            font-size: 1.5em;
+            font-weight: bold;
+            height: 40px;
+        }
+        
+        .correct {
+            color: var(--green);
+        }
+
+        .incorrect {
+            color: var(--red);
+        }
+        
+        .level-up-message {
+            padding: 40px;
+            background-color: #eaf2f8;
+            border-radius: 15px;
+            color: var(--purple);
+        }
+
+        #leaderboard {
+            list-style-type: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+
+        #leaderboard li {
+            background-color: var(--light-gray);
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.2em;
+        }
+
+        #leaderboard li:nth-child(1) {
+            background-color: #ffd700; /* Gold */
+            font-weight: bold;
+        }
+        #leaderboard li:nth-child(2) {
+            background-color: #c0c0c0; /* Silver */
+        }
+        #leaderboard li:nth-child(3) {
+            background-color: #cd7f32; /* Bronze */
+        }
+        
+        .emoji {
+            font-size: 1.5em;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        
+        <div id="start-screen" class="screen active">
+            <h1>เกมเรียงประโยค 🚀</h1>
+            <p>มาฝึกทักษะการเรียงประโยคภาษาไทยให้เก่งขึ้นกันเถอะ!</p>
+            <div class="input-group">
+                <input type="text" id="player-name" placeholder="ใส่ชื่อเล่นของคุณที่นี่...">
+            </div>
+            <button id="start-button">เริ่มเกม!</button>
+        </div>
+
+        <div id="instructions-screen" class="screen">
+            <h2>วิธีเล่นเกม 📝</h2>
+            <p>
+                1. <strong>ลากและวาง:</strong> ลากคำศัพท์ที่กระจัดกระจายอยู่ในกล่องด้านบน มาวางเรียงกันในกล่องสีเขียวให้เป็นประโยคที่ถูกต้อง<br>
+                2. <strong>ส่งคำตอบ:</strong> เมื่อเรียงเสร็จแล้ว ให้กดปุ่ม "ส่งคำตอบ"<br>
+                3. <strong>เงื่อนไขผ่านด่าน:</strong> ต้องตอบถูกอย่างน้อย 60% ในแต่ละด่าน เพื่อไปต่อ<br>
+                4. <strong>เวลา:</strong> น้องๆ มีเวลาทั้งหมด 10 นาทีในการเล่น สู้ๆ นะ! ⏳
+            </p>
+            <button id="begin-button">รับทราบและเริ่มเลย!</button>
+        </div>
+
+        <div id="game-screen" class="screen">
+            <div class="game-header">
+                <div id="player-display">ผู้เล่น: </div>
+                <div id="level-display">ด่านที่: 1</div>
+                <div id="score">คะแนน: 0</div>
+                <div id="timer">เวลา: 10:00</div>
+            </div>
+            
+            <p><strong>ลากคำมาวางในกล่องสีเขียวด้านล่างให้ถูกต้อง 👇</strong></p>
+            <div id="question-area"></div>
+            <div id="answer-area"></div>
+            
+            <button id="submit-button">ส่งคำตอบ ✅</button>
+            <div id="feedback"></div>
+        </div>
+        
+        <div id="level-up-screen" class="screen">
+            <div class="level-up-message">
+                <h2>ยินดีด้วย! 🎉</h2>
+                <p id="level-up-text"></p>
+                <button id="next-level-button">ไปด่านต่อไป!</button>
+            </div>
+        </div>
+
+
+        <div id="game-over-screen" class="screen">
+            <h2>จบเกมแล้ว! 🏁</h2>
+            <p id="summary-text">เยี่ยมมาก!</p>
+            <h3>🏆 อันดับผู้เล่นยอดเยี่ยม 🏆</h3>
+            <ol id="leaderboard"></ol>
+            <button id="play-again-button">เล่นอีกครั้ง</button>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Elements ---
+            const startScreen = document.getElementById('start-screen');
+            const instructionsScreen = document.getElementById('instructions-screen');
+            const gameScreen = document.getElementById('game-screen');
+            const levelUpScreen = document.getElementById('level-up-screen');
+            const gameOverScreen = document.getElementById('game-over-screen');
+
+            const playerNameInput = document.getElementById('player-name');
+            const startButton = document.getElementById('start-button');
+            const beginButton = document.getElementById('begin-button');
+            const submitButton = document.getElementById('submit-button');
+            const nextLevelButton = document.getElementById('next-level-button');
+            const playAgainButton = document.getElementById('play-again-button');
+            
+            const playerDisplay = document.getElementById('player-display');
+            const levelDisplay = document.getElementById('level-display');
+            const scoreDisplay = document.getElementById('score');
+            const timerDisplay = document.getElementById('timer');
+            const questionArea = document.getElementById('question-area');
+            const answerArea = document.getElementById('answer-area');
+            const feedbackDisplay = document.getElementById('feedback');
+            const levelUpText = document.getElementById('level-up-text');
+            const summaryText = document.getElementById('summary-text');
+            const leaderboardList = document.getElementById('leaderboard');
+            
+            // --- Game State ---
+            let playerName = '';
+            let score = 0;
+            let currentLevel = 1;
+            let timeRemaining = 600; // 10 minutes in seconds
+            let timerInterval;
+            let currentQuestion = null;
+            let questionsAnsweredInLevel = 0;
+            let correctAnswersInLevel = 0;
+            let draggedItem = null;
+
+            const questions = [
+                // ระดับ 1: ประธาน + กริยา + กรรม (S+V+O)
+                { level: 1, parts: ['ฉัน', 'กิน', 'ข้าว'], correctAnswer: 'ฉันกินข้าว' },
+                { level: 1, parts: ['แมว', 'ดื่ม', 'นม'], correctAnswer: 'แมวดื่มนม' },
+                // ระดับ 2: ประธาน + กริยา + กรรม + ขยายกรรม (S+V+O+O.Mod)
+                { level: 2, parts: ['พ่อ', 'อ่าน', 'หนังสือ', 'เล่มใหญ่'], correctAnswer: 'พ่ออ่านหนังสือเล่มใหญ่' },
+                { level: 2, parts: ['แม่', 'ซื้อ', 'เสื้อผ้า', 'สวยงาม'], correctAnswer: 'แม่ซื้อเสื้อผ้าสวยงาม' },
+                { level: 2, parts: ['ชาวนา', 'ปลูก', 'ข้าว', 'หอมมะลิ'], correctAnswer: 'ชาวนาปลูกข้าวหอมมะลิ' },
+                // ระดับ 3: ประธาน + กริยา + ขยายกริยา + กรรม (S+V+Adv+O)
+                { level: 3, parts: ['พี่', 'ขี่', 'จักรยาน', 'อย่างรวดเร็ว'], correctAnswer: 'พี่ขี่จักรยานอย่างรวดเร็ว' },
+                { level: 3, parts: ['คุณครู', 'สอน', 'นักเรียน', 'อย่างตั้งใจ'], correctAnswer: 'คุณครูสอนนักเรียนอย่างตั้งใจ' },
+                // ระดับ 4: ประธาน + ขยายประธาน + กริยา + กรรม + ขยายกรรม (S+S.Mod+V+O+O.Mod)
+                { level: 4, parts: ['น้องสาว', 'ของฉัน', 'วาด', 'รูปภาพ', 'สวยงาม'], correctAnswer: 'น้องสาวของฉันวาดรูปภาพสวยงาม' },
+                { level: 4, parts: ['สุนัข', 'ตัวอ้วน', 'กิน', 'กระดูก', 'ชิ้นใหญ่'], correctAnswer: 'สุนัขตัวอ้วนกินกระดูกชิ้นใหญ่' },
+                { level: 4, parts: ['นก', 'สีฟ้า', 'ร้องเพลง', 'ไพเราะ'], correctAnswer: 'นกสีฟ้าร้องเพลงไพเราะ' }
+            ];
+
+            let availableQuestions = [...questions];
+
+            const questionsPerLevel = {
+                1: questions.filter(q => q.level === 1).length,
+                2: questions.filter(q => q.level === 2).length,
+                3: questions.filter(q => q.level === 3).length,
+                4: questions.filter(q => q.level === 4).length,
+            };
+            
+            // --- Functions ---
+            const switchScreen = (screenId) => {
+                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                document.getElementById(screenId).classList.add('active');
+            };
+
+            const startGame = () => {
+                playerName = playerNameInput.value.trim();
+                if (playerName === '') {
+                    alert('กรุณาใส่ชื่อก่อนเริ่มเกมนะครับ 😊');
+                    return;
+                }
+                playerDisplay.textContent = `ผู้เล่น: ${playerName}`;
+                switchScreen('instructions-screen');
+            };
+
+            const beginGame = () => {
+                resetGame();
+                switchScreen('game-screen');
+                startTimer();
+                loadNextQuestion();
+            };
+
+            const resetGame = () => {
+                score = 0;
+                currentLevel = 1;
+                timeRemaining = 600;
+                availableQuestions = [...questions];
+                scoreDisplay.textContent = `คะแนน: 0`;
+                levelDisplay.textContent = `ด่านที่: 1`;
+                questionsAnsweredInLevel = 0;
+                correctAnswersInLevel = 0;
+                if(timerInterval) clearInterval(timerInterval);
+            };
+
+            const startTimer = () => {
+                timerInterval = setInterval(() => {
+                    timeRemaining--;
+                    const minutes = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
+                    const seconds = (timeRemaining % 60).toString().padStart(2, '0');
+                    timerDisplay.textContent = `เวลา: ${minutes}:${seconds}`;
+
+                    if (timeRemaining <= 0) {
+                        endGame('timeup');
+                    }
+                }, 1000);
+            };
+
+            const loadNextQuestion = () => {
+                feedbackDisplay.textContent = '';
+                feedbackDisplay.className = '';
+                submitButton.disabled = false;
+                
+                let levelQuestions = availableQuestions.filter(q => q.level === currentLevel);
+
+                if (levelQuestions.length === 0) {
+                    handleLevelEnd();
+                    return;
+                }
+
+                currentQuestion = levelQuestions[0];
+                
+                // Remove this question from the main pool
+                availableQuestions = availableQuestions.filter(q => q !== currentQuestion);
+
+                questionArea.innerHTML = '';
+                answerArea.innerHTML = '';
+
+                const shuffledParts = [...currentQuestion.parts].sort(() => Math.random() - 0.5);
+                shuffledParts.forEach((part, index) => {
+                    const wordBlock = document.createElement('div');
+                    wordBlock.className = 'word-block';
+                    wordBlock.textContent = part;
+                    wordBlock.draggable = true;
+                    wordBlock.id = `word-${index}`;
+                    wordBlock.addEventListener('dragstart', dragStart);
+                    questionArea.appendChild(wordBlock);
+                });
+            };
+
+            const checkAnswer = () => {
+                const wordsInAnswer = Array.from(answerArea.children).map(child => child.textContent);
+                const userAnswer = wordsInAnswer.join('');
+
+                if (userAnswer === currentQuestion.correctAnswer) {
+                    score += 10;
+                    correctAnswersInLevel++;
+                    feedbackDisplay.textContent = 'ถูกต้องครับ! 👍';
+                    feedbackDisplay.className = 'correct';
+                } else {
+                    feedbackDisplay.textContent = 'ยังไม่ถูกนะ ลองใหม่! 🤔';
+                    feedbackDisplay.className = 'incorrect';
+                }
+                
+                scoreDisplay.textContent = `คะแนน: ${score}`;
+                questionsAnsweredInLevel++;
+                submitButton.disabled = true;
+
+                setTimeout(() => {
+                    if (questionsAnsweredInLevel >= questionsPerLevel[currentLevel]) {
+                        handleLevelEnd();
+                    } else {
+                        loadNextQuestion();
+                    }
+                }, 1500);
+            };
+            
+            const handleLevelEnd = () => {
+                 const passPercentage = (correctAnswersInLevel / questionsPerLevel[currentLevel]) * 100;
+                 
+                 if (passPercentage >= 60) {
+                     if (currentLevel < 4) {
+                        currentLevel++;
+                        levelUpText.textContent = `น้องผ่านด่านที่ ${currentLevel - 1} แล้ว! เตรียมตัวพบกับด่านที่ ${currentLevel} ที่ท้าทายยิ่งขึ้น!`;
+                        switchScreen('level-up-screen');
+                        // Reset level counters
+                        questionsAnsweredInLevel = 0;
+                        correctAnswersInLevel = 0;
+                     } else {
+                         endGame('completed');
+                     }
+                 } else {
+                     endGame('failed_level');
+                 }
+            };
+            
+            const proceedToNextLevel = () => {
+                levelDisplay.textContent = `ด่านที่: ${currentLevel}`;
+                switchScreen('game-screen');
+                loadNextQuestion();
+            };
+
+            const endGame = (reason) => {
+                clearInterval(timerInterval);
+                let message = '';
+                switch(reason) {
+                    case 'completed':
+                        message = `🎉 สุดยอดมาก ${playerName}! น้องเล่นจบทุกด่านเลย ได้คะแนนไป ${score} คะแนน ใช้เวลาไป ${formatTime(600 - timeRemaining)}!`;
+                        break;
+                    case 'timeup':
+                        message = `⏳ เวลาหมดแล้ว! ไม่เป็นไรนะ ${playerName} ครั้งหน้าเอาใหม่! น้องทำได้ ${score} คะแนน`;
+                        break;
+                    case 'failed_level':
+                        message = `พยายามอีกนิดนะ! น้องยังไม่ผ่านด่านที่ ${currentLevel} ลองฝึกฝนแล้วกลับมาสู้ใหม่นะ! ได้คะแนนรวม ${score} คะแนน`;
+                        break;
+                }
+                summaryText.textContent = message;
+                updateLeaderboard();
+                displayLeaderboard();
+                switchScreen('game-over-screen');
+            };
+
+            const updateLeaderboard = () => {
+                const leaderboard = JSON.parse(localStorage.getItem('sentenceGameLeaderboard')) || [];
+                const timeTaken = 600 - timeRemaining;
+                
+                leaderboard.push({ name: playerName, score: score, time: timeTaken });
+
+                leaderboard.sort((a, b) => {
+                    if (b.score !== a.score) {
+                        return b.score - a.score; // Higher score first
+                    }
+                    return a.time - b.time; // Lower time first
+                });
+
+                // Keep only top 10
+                const top10 = leaderboard.slice(0, 10);
+                localStorage.setItem('sentenceGameLeaderboard', JSON.stringify(top10));
+            };
+
+            const displayLeaderboard = () => {
+                const leaderboard = JSON.parse(localStorage.getItem('sentenceGameLeaderboard')) || [];
+                leaderboardList.innerHTML = '';
+                if (leaderboard.length === 0) {
+                    leaderboardList.innerHTML = '<li>ยังไม่มีใครเล่นเลย มาเป็นคนแรกสิ!</li>';
+                    return;
+                }
+                leaderboard.forEach((entry, index) => {
+                    const li = document.createElement('li');
+                    let medal = '';
+                    if (index === 0) medal = '🥇';
+                    if (index === 1) medal = '🥈';
+                    if (index === 2) medal = '🥉';
+                    
+                    li.innerHTML = `<span>${medal} ${index + 1}. ${entry.name}</span> <span>${entry.score} คะแนน (${formatTime(entry.time)})</span>`;
+                    leaderboardList.appendChild(li);
+                });
+            };
+            
+            const formatTime = (seconds) => {
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                return `${mins} นาที ${secs} วินาที`;
+            };
+
+
+            // --- Drag and Drop Handlers ---
+            function dragStart(e) {
+                draggedItem = e.target;
+                setTimeout(() => {
+                    e.target.style.display = 'none';
+                }, 0);
+            }
+
+            function dragOver(e) {
+                e.preventDefault();
+            }
+
+            function drop(e) {
+                e.preventDefault();
+                if (e.target.id === 'answer-area' || e.target.id === 'question-area') {
+                    draggedItem.style.display = 'block';
+                    e.target.appendChild(draggedItem);
+                    draggedItem = null;
+                }
+            }
+
+
+            // --- Event Listeners ---
+            startButton.addEventListener('click', startGame);
+            beginButton.addEventListener('click', beginGame);
+            submitButton.addEventListener('click', checkAnswer);
+            nextLevelButton.addEventListener('click', proceedToNextLevel);
+            playAgainButton.addEventListener('click', () => switchScreen('start-screen'));
+
+            questionArea.addEventListener('dragover', dragOver);
+            questionArea.addEventListener('drop', drop);
+            answerArea.addEventListener('dragover', dragOver);
+            answerArea.addEventListener('drop', drop);
+        });
+    </script>
+</body>
+</html>
