@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ทะเบียนผลิตสื่อและนวัตกรรมการสอน</title>
+    <link href="tailwind.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body {
+            font-family: 'Prompt', sans-serif;
+        }
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #fff;
+            border-radius: 50%;
+            border-top-color: #facc15;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-r from-yellow-100 via-purple-100 to-yellow-100 min-h-screen flex flex-col">
+    <div class="container mx-auto px-4 py-8 flex-grow">
+        <h1 class="text-3xl md:text-4xl font-bold text-center text-purple-800 mb-8">ทะเบียนผลิตสื่อและนวัตกรรมการสอน</h1>
+        
+        <!-- Form -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8 max-w-2xl mx-auto">
+            <form id="mediaForm" class="space-y-4">
+                <div>
+                    <label for="no" class="block text-sm font-medium text-gray-700">ที่</label>
+                    <input type="number" id="no" name="no" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-500 focus:ring-opacity-50">
+                </div>
+                <div>
+                    <label for="date" class="block text-sm font-medium text-gray-700">วันที่ผลิต</label>
+                    <input type="date" id="date" name="date" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-500 focus:ring-opacity-50">
+                </div>
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700">ชื่อสื่อ/นวัตกรรม</label>
+                    <input type="text" id="name" name="name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-500 focus:ring-opacity-50">
+                </div>
+                <div>
+                    <label for="produce" class="block text-sm font-medium text-gray-700">ชื่อผู้ผลิต</label>
+                    <input type="text" id="produce" name="produce" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-500 focus:ring-opacity-50">
+                </div>
+                <div>
+                    <label for="amount" class="block text-sm font-medium text-gray-700">จำนวน</label>
+                    <input type="number" id="amount" name="amount" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-500 focus:ring-opacity-50">
+                </div>
+                <div>
+                    <label for="object" class="block text-sm font-medium text-gray-700">จุดประสงค์</label>
+                    <textarea id="object" name="object" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-500 focus:ring-opacity-50"></textarea>
+                </div>
+                <div>
+                    <label for="name2" class="block text-sm font-medium text-gray-700">ผู้รับรอง</label>
+                    <input type="text" id="name2" name="name2" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-500 focus:ring-opacity-50">
+                </div>
+                <button type="submit" id="submitBtn" class="w-full bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50">บันทึกข้อมูล</button>
+            </form>
+            <p id="status" class="mt-4 text-center text-sm text-gray-600"></p>
+        </div>
+
+        <!-- Table -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-2xl font-semibold text-purple-800 mb-4">ข้อมูลล่าสุด</h2>
+            <div class="overflow-x-auto">
+                <table id="dataTable" class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-purple-100">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-purple-800 uppercase tracking-wider">ที่</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-purple-800 uppercase tracking-wider">วันที่ผลิต</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-purple-800 uppercase tracking-wider">ชื่อสื่อ/นวัตกรรม</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-purple-800 uppercase tracking-wider">ชื่อผู้ผลิต</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-purple-800 uppercase tracking-wider">จำนวน</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-purple-800 uppercase tracking-wider">จุดประสงค์</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-purple-800 uppercase tracking-wider">ผู้รับรอง</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="bg-white divide-y divide-gray-200">
+                        <!-- Data will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-purple-800 text-white text-center py-4">
+        <p>© 2025 ทะเบียนผลิตสื่อและนวัตกรรมการสอน</p>
+    </footer>
+
+    <script>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbwx4ApsZ4wf-mlBCyqEVaWFU1tquXEQiIv3OC027CUBzmruA649hoh21zYewxQhm7yihQ/exec';
+        const form = document.getElementById('mediaForm');
+        const status = document.getElementById('status');
+        const submitBtn = document.getElementById('submitBtn');
+        const tableBody = document.getElementById('tableBody');
+
+        // Fetch and display data
+        async function fetchData() {
+            try {
+                const response = await axios.get(scriptURL);
+                const data = response.data;
+                tableBody.innerHTML = '';
+                data.forEach(row => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap">${row[0]}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${row[1]}</td>
+                        <td class="px-6 py-4">${row[2]}</td>
+                        <td class="px-6 py-4">${row[3]}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${row[4]}</td>
+                        <td class="px-6 py-4">${row[5]}</td>
+                        <td class="px-6 py-4">${row[6]}</td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                status.textContent = 'เกิดข้อผิดพลาดในการดึงข้อมูล';
+                status.classList.add('text-red-600');
+            }
+        }
+
+        // Form submission
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            submitBtn.disabled = true;
+            submitBtn.classList.add('loading');
+            status.textContent = 'กำลังบันทึก...';
+            status.classList.remove('text-green-600', 'text-red-600');
+
+            const formData = new FormData(form);
+            try {
+                const response = await axios.post(scriptURL, formData);
+                if (response.data.status === 'success') {
+                    status.textContent = 'บันทึกข้อมูลสำเร็จ!';
+                    status.classList.add('text-green-600');
+                    form.reset();
+                    fetchData(); // Refresh table
+                } else {
+                    status.textContent = 'เกิดข้อผิดพลาดในการบันทึก';
+                    status.classList.add('text-red-600');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                status.textContent = 'เกิดข้อผิดพลาดในการบันทึก';
+                status.classList.add('text-red-600');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('loading');
+            }
+        });
+
+        // Initial data fetch
+        fetchData();
+    </script>
+</body>
+</html>
